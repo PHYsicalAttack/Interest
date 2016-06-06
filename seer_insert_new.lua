@@ -6,7 +6,7 @@
 -----------------------------------
 --控制变量表
 local key={
-	severid	 = 17,							--服务器id
+	severid	 = 7,							--服务器id
 	acc_need = false,						--是否需要插入账号，如果有账号则不用多次插入
 	role_need = true,						--是否需要角色
 	family_need = false, 						--不使用的话改成false,不要用于平常正式测试!!!用sql注入公会成员数据会有其他问题，目的是为了紧急测试公会战
@@ -15,7 +15,7 @@ local key={
 	amount 	=200,							--插入的角色数量
 }
 local login_database = "seer_login" 			--需要插入账号的数据库
-local game_database = "seer2"					--需要插入角色的数据库
+local game_database = "seer1"					--需要插入角色的数据库
 
 --每次执行删除上次的写出文件
 os.execute("rm " .. os.getenv("HOME") .. "/Desktop/seer.sql")				
@@ -45,7 +45,7 @@ local grole={									--角色数据表
 	1,											--level等级
 	0,											--level经验
 	0,											--nonolv
-	12345,										--power
+	10000,										--power
 	0,											--totalpaid
 	"9842053723102220",							--devid
 	"",											--familyid
@@ -84,6 +84,10 @@ local gfamily=									--公会信息表，还需插入gFMember,gFName，修改g
 	"",									--impeach_list
 }
 
+local gfighters=
+{
+	context="0x836c0000000168136400036765726e0500d3c7b743ba620000040f64000b656c6563747269636974796105610061016100610061026100681664000461747472616a620000021c61006164610061006100610062000001f46100610061006155610c616661146100610061006100610061ee620000021c61006a6a610e610d6a,0x836a,0x789c6bce0200017200ee"
+}
 
 for  i=1,key.amount do
 	if key.acc_need then 
@@ -103,11 +107,13 @@ for  i=1,key.amount do
 			if j==2 then v =string.format("%s%d",v,i) end 						--给角色名加对应数字
 			if j==4 then v=string.format("%s%d",v,i) end 						--给账号加对应数字
 			if j==6 then v= math.random(v) end 									--随机头像
+			if j==11 then v = math.random(200,v) end
 			if  type(v)=="string" then v= string.format("\34%s\34",v) end 		--字符串加引号
 			str_role=str_role .. "," .. v
  		end 
  		file:write(string.format("insert into %s.grole values(%s);\10",game_database,string.sub(str_role,2)))
  		file:write(string.format("insert into %s.grname values(%d,\34%s%d\34);\10",game_database,grole[1]+i,grole[2],i))
+ 		file:write(string.format("insert into %s.gfighters values(%d,%s);\10",game_database,grole[1]+i,gfighters.context))
  	end
  	if key.family_need or 1 then  --改变racc的值
  	account[1]=account[1]+1;grole[3]=((key.severid+1)*1000000)*100000+account[1]	--改表值的败笔

@@ -10,9 +10,17 @@ function Interest:Info()	--开始是时要调用这个函数
 	os.execute("clear")
 	local i=i or 1
 	self.Desc ="Desc: 有时候难免会寂寞无聊，就用这些函数填补吧~!"
-	self.times =10000	--万分无聊
-	self.NoR="November_Rain.lua"
-	self.Demons="Demons.lua"
+	self.times =10000		--万分无聊
+	self.lycnames={								--歌曲目录
+					[1]="November_Rain.lua",
+					[2]="Demons.lua",
+					[3]="ふわふわ时间.lua",
+					[4]="天使にふれたよ!.lua",
+					[5]="Don’t say “lazy”.lua",
+					[6]="U&I(映画｢けいおん!｣Mix).lua",
+					[7]="わたしの恋はホッチキス.lua",
+					[8]="Only my railgun.lua",
+				}
 	self.path ="/Users/0280102pc0102/Desktop/what it means/aul/Interest.lua"
 	self.height = 34   --34
 	self.width = self.height *3
@@ -34,7 +42,16 @@ function Interest:Info()	--开始是时要调用这个函数
 			i=i+1
 		end
 	end
+	self:SongIndex()
 end
+
+function Interest:SongIndex()
+	print("【歌曲目录】")
+	for i,v in ipairs(self.lycnames) do
+		print(i .. "." ..v)
+	end
+end
+
 function Interest:PrintTime(times,sec)
 	local times = times or self.times	
 	local sec =sec or 0
@@ -50,28 +67,26 @@ end
 
 function Interest:PlayLyc(nlyc,times,sec) --play lyc
 	local times = times or self.times
-	local sec =sec or 0
-	local sec =math.max(sec-1,0)
+	local sec =sec or 0.88
 	local nlyc=nlyc
 	local lyc_file 
-	if (not nlyc) or nlyc ==1 then 
-		 lyc_file =self.NoR
+	if (not nlyc) or nlyc >#self.lycnames then
+		 lyc_file =self.lycnames[math.random(#self.lycnames)]
 	else
-		 lyc_file = self.Demons
+		lyc_file = self.lycnames[nlyc]
 	end		
 	local lyc_path= string.sub(self.path,string.find(self.path,"/.*/")) .. "cyl/" .. lyc_file
 	local file = io.open(lyc_path)
 	for i=1,times do	
 		for l in file:lines() do
-			local pre = os.time()
-			repeat
-				local now=os.time()
-			until now>pre+sec
+			self:Delay(sec)
 			print(l)
 		end
-		print(string.rep("*",string.len(lyc_path)))
+		print(string.rep("*",math.floor(string.len(lyc_path)/2)))
 		file:seek("set")
 	end
+	file:close()
+	self:SongIndex()
 end
 
 function Interest:DecFloor(num,bit)		--小数取整，多带了一个bit参数，不要用bit参数，估计用不到，本来不想带的，太丑
@@ -206,6 +221,6 @@ end
 function Interest:Star()
 	
 end
-
-
 Interest:Info()
+--return Interest
+
