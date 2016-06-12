@@ -21,6 +21,10 @@ function Interest:Info()	--开始是时要调用这个函数
 					[7]="わたしの恋はホッチキス.lua",
 					[8]="Only my railgun.lua",
 				}
+	self.picnames={
+					[1]="御坂美琴.lua",
+					[2]="呆唯.lua",
+				}
 	self.path ="/Users/0280102pc0102/Desktop/what it means/aul/Interest.lua"
 	self.height = 34   --34
 	self.width = self.height *3
@@ -37,18 +41,26 @@ function Interest:Info()	--开始是时要调用这个函数
 				func_var ="(tinysec)"
 			elseif tostring(k) == "DecFloor" then
 				func_var = "(num)"
+			elseif tostring(k) == "OrderPlayLyc" then
+				func_var ="(order,times)"
+			elseif tostring(k) == "PlayPicture" then
+				func_var ="(npic,speway)"
 			end	
 			print(i .. ". " .. type(v) .. ": " ..k .. func_var)
 			i=i+1
 		end
 	end
-	self:SongIndex()
+	self:Index()
 end
 
-function Interest:SongIndex()
+function Interest:Index()
 	print("【歌曲目录】")
 	for i,v in ipairs(self.lycnames) do
-		print(i .. "." ..v)
+		print(i .. "." ..string.sub(v,1,-5))
+	end
+	print("【图片目录】")
+	for i,v in ipairs(self.picnames) do
+		print(i .. "." ..string.sub(v,1,-5))
 	end
 end
 
@@ -82,11 +94,24 @@ function Interest:PlayLyc(nlyc,times,sec) --play lyc
 			self:Delay(sec)
 			print(l)
 		end
-		print(string.rep("*",math.floor(string.len(lyc_path)/2)))
+		print(string.rep("*",math.floor(string.len(lyc_path)/2)) .. "\n")
 		file:seek("set")
 	end
 	file:close()
-	self:SongIndex()
+	--self:Index()
+end
+
+function Interest:OrderPlayLyc(order,times)				--1随机播放，2顺序播放，times实际相当于播放的歌曲数目
+	local times = times or self.times
+	local order =order or 1      					
+	for k=1,times do
+		if order == 1 then 
+			self:PlayLyc(math.random(#self.lycnames),1)
+		else
+			local lyc_id = (k-1)%(#self.lycnames)+1
+			self:PlayLyc(lyc_id,1)
+		end
+	end
 end
 
 function Interest:DecFloor(num,bit)		--小数取整，多带了一个bit参数，不要用bit参数，估计用不到，本来不想带的，太丑
@@ -201,8 +226,7 @@ function Interest:GreedySnake()
 		end
 		self:ScreenDraw(screen_output,0.1)
 		cs=cs+1
-		--print(cs)
-		--print(snake_y,snake_x)
+		--print(cs) --print(snake_y,snake_x)
 		if snake_y and snake_x then 
 			table.insert(snake,{snake_x,snake_y})
 		end
@@ -217,6 +241,45 @@ function Interest:ScreenDraw(str,sec)
 	os.execute("clear")
 	print(str)
 end
+
+function Interest:PlayPicture(npic,speway)
+	local pic_file
+	if (not npic) or npic >#self.picnames then 
+		pic_file=self.picnames[math.random(#self.picnames)]
+	else
+		pic_file= self.picnames[npic]
+	end
+	local pic_path=string.sub(self.path,string.find(self.path,"/.*/")) .. "cyl/" .. pic_file
+	local file = io.open(pic_path)
+	local line_num=0
+	for l in file:lines() do
+		line_num = line_num +1
+	end
+	file:seek("set")
+	if not speway then 
+		local pic=file:read("*a")
+		print(pic)
+	else
+		local pic=""
+		local line=0
+		while file:read("*l") do
+			line=line+1
+			file:seek("set")
+			for i =1,line do
+				local line_str=file:read("*l")
+				pic= pic .. "\n".. line_str
+			end
+			local line_left = line_num -line 
+			if line_left>0 then 
+				for i=1,line_left do
+			 		pic=pic .. "\n"
+				end 
+			end
+			self:ScreenDraw(pic,0.1)
+		end
+	end
+	file:close()
+end 
 
 function Interest:Star()
 	
