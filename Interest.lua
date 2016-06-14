@@ -20,6 +20,7 @@ function Interest:Info()	--开始是时要调用这个函数
 					[6]="U&I(映画｢けいおん!｣Mix).lua",
 					[7]="わたしの恋はホッチキス.lua",
 					[8]="Only my railgun.lua",
+					[9]="Don't cry.lua",
 				}
 	self.picnames={
 					[1]="御坂美琴.lua",
