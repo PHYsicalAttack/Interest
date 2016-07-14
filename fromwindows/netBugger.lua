@@ -35,12 +35,17 @@ function dealurl(url,keyword,startpage,endpage)
 	return downt
 end
 --下载图片
-local keyword="轻音少女"
+local keyword="魔法少女伊莉雅动图"
 local startpage =0
-local endpage =500
-local dir = "F:/netbuger/"
-res,err= os.execute("mkdir ".. string.gsub(dir,"/","\\").. keyword)
-print(res , err)
+local endpage =20
+--local dir = "F:/netbuger/"
+local dir = "/Users/0280102pc0102/Desktop/whatitmeans/fig/"
+if os.getenv("OS") == "Windows_NT" then 
+	res,err= os.execute("mkdir ".. string.gsub(dir,"/","\\").. keyword)
+else 
+	res,err= os.execute("mkdir ".. dir .. keyword)
+end
+print(res , er)
 for i,v in ipairs(dealurl(url,keyword,endpage)) do
 	local pretime=socket.gettime()
 	local ext = string.match(v,"%..+",-5)
@@ -55,3 +60,4 @@ for i,v in ipairs(dealurl(url,keyword,endpage)) do
 		print("used " .. string.format("%.2f",endtime-pretime) .. "s,download " .. i ..  " pic from " .. v .." failed because of " .. err)
 	end
 end
+print("mission compeleted!")

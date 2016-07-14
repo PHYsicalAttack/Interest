@@ -19,7 +19,7 @@ http.TIMEOUT = 3
 local res3,code3 =https.request("htpp://www.google.com")
 print(res3,code3)]]
 
-local context,code = http.request("http://10.10.11.20/cmd?type=any")  --170
+local context,code = http.request("http://10.10.11.20/cmd?type=170")  --170
 --local context,code = http.request("http://10.10.11.20/cmd?type=pkg")  --主线
 print(code)
 os.remove(os.getenv("HOME") .. "/Desktop/test.zip")
