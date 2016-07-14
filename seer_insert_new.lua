@@ -6,16 +6,16 @@
 -----------------------------------
 --控制变量表
 local key={
-	severid	 = 7,							--服务器id
+	severid	 = 17,							--服务器id
 	acc_need = false,						--是否需要插入账号，如果有账号则不用多次插入
 	role_need = true,						--是否需要角色
-	family_need = false, 						--不使用的话改成false,不要用于平常正式测试!!!用sql注入公会成员数据会有其他问题，目的是为了紧急测试公会战
+	family_need = false, 					--不使用的话改成false,不要用于平常正式测试!!!用sql注入公会成员数据会有其他问题，目的是为了紧急测试公会战显示
 	family_member=20,						--只会为bot100以后的角色注入公会，一个公会20人，最多5个公会,按照 id % family_need来分配公会的
 	money_need = true, 	 					--暂时没有用
 	amount 	=200,							--插入的角色数量
 }
 local login_database = "seer_login" 			--需要插入账号的数据库
-local game_database = "seer1"					--需要插入角色的数据库
+local game_database = "seer2"					--需要插入角色的数据库
 
 --每次执行删除上次的写出文件
 os.execute("rm " .. os.getenv("HOME") .. "/Desktop/seer.sql")				
@@ -48,11 +48,11 @@ local grole={									--角色数据表
 	10000,										--power
 	0,											--totalpaid
 	"9842053723102220",							--devid
-	"",											--familyid
+	0,											--familyid
 	"",											--familyname
-	"",											--lastlogout
+	1451620800,									--lastlogout(2015-1-1)
 	"",											--desc
-	"",											--overdue
+	0,											--overdue
 	"2015-1-1",									--regtime
 	"pc",										--phone_model
 	"mac",										--sys_version

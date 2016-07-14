@@ -1,9 +1,16 @@
 # Compiled Lua sources
 luac.out
+
+# ignore some dirs
 /AliceLuaPackage
 /AliceLuaPackage/*
+/Dota-Reborn-Package
 /Dota-Reborn-Package/*
+/lua
 /lua/*
+/3.0rc1-2
+/3.0rc1-2/*
+
 # luarocks build files
 *.src.rock
 *.zip
