@@ -1,7 +1,7 @@
 # Compiled Lua sources
 luac.out
-AliceLuaPackage
-AliceLuaPackage/*
+/AliceLuaPackage
+/AliceLuaPackage/*
 /Dota-Reborn-Package/*
 /lua/*
 # luarocks build files
