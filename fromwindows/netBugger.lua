@@ -45,7 +45,7 @@ if os.getenv("OS") == "Windows_NT" then
 else 
 	res,err= os.execute("mkdir ".. dir .. keyword)
 end
-print(res , er)
+print("mkdir result:",res ,"error:",err)
 for i,v in ipairs(dealurl(url,keyword,endpage)) do
 	local pretime=socket.gettime()
 	local ext = string.match(v,"%..+",-5)
@@ -60,4 +60,4 @@ for i,v in ipairs(dealurl(url,keyword,endpage)) do
 		print("used " .. string.format("%.2f",endtime-pretime) .. "s,download " .. i ..  " pic from " .. v .." failed because of " .. err)
 	end
 end
-print("mission compeleted!")
+print("\nMission compeleted! Have fun!!")
