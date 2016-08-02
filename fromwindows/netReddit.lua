@@ -7,10 +7,12 @@ local url="http://tieba.baidu.com/p/%d?pn=%d"
 
 function dealurl(url,id)
   local downt = {}
-  local tlen = 0
-  local pn = 0
+  local pn = 1
   local res,err = http.request(string.format(url,id,pn))
+  local isrecord = true 
+  local issame = ""
   while err == 200 do
+  	local prepage = string.sub(res,1000,1200)
   	for l in string.gmatch(res,"BDE_Image.-%.jpg") do
 		l = string.match(l,"http://.-%jpg")
 		local head_80 = "http://tb2.bdstatic.com/tb/static-pb/img/head_80.jpg"
@@ -27,23 +29,27 @@ function dealurl(url,id)
 			else
 				table.insert(downt,l)
 			end
+			if isrecord == true then 
+				isrecord = false
+				if issame == downt[#downt] then
+					table.remove(downt,#downt)
+					return downt
+				else
+					issame = downt[#downt]
+				end
+			end
 		end
 	end
+	isrecord = true
   	pn= pn+1
-  	local ulen =#downt
-  	if tlen == ulen then 
-  		return downt
-  	else
-  		tlen = ulen 
-  	end
-  	print("Now is page:",pn,"len of downt:",#downt)
   	res,err = http.request(string.format(url,id,pn))
+  	print("Now is page:",pn,"len of downt:",#downt)
   end
   return downt
 end
 --首先要确定帖子没有被删除,没有做删除的判断
 
-local reddit = 3455680674
+local reddit = 4350107485
 local dir = "/Users/0280102pc0102/Desktop/whatitmeans/fig/"
 if os.getenv("OS") == "Windows_NT" then 
 	res,err= os.execute("mkdir ".. string.gsub(dir,"/","\\").. "reddit" ..reddit)
