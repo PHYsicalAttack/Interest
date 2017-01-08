@@ -38,8 +38,8 @@ function dealurl(url,id)
 					issame = downt[#downt]
 				end
 			end
-		else 
-			return downt
+		--[[else 
+			return downt]]
 		end
 	end
 	isrecord = true
@@ -51,7 +51,7 @@ function dealurl(url,id)
 end
 --首先要确定帖子没有被删除,没有做删除的判断
 
-local reddit = 2261846778
+local reddit = 4195254464
 local dir = "/Users/0280102pc0102/Desktop/whatitmeans/fig/"
 if os.getenv("OS") == "Windows_NT" then 
 	res,err= os.execute("mkdir ".. string.gsub(dir,"/","\\").. "reddit" ..reddit)

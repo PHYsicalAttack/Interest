@@ -35,9 +35,9 @@ function dealurl(url,keyword,startpage,endpage)
 	return downt
 end
 --下载图片
-local keyword="魔法少女伊莉雅动图"
+local keyword="秋山澪"
 local startpage =0
-local endpage =20
+local endpage =40   --这儿是一个网页，每隔20一个新网页。。
 --local dir = "F:/netbuger/"
 local dir = "/Users/0280102pc0102/Desktop/whatitmeans/fig/"
 if os.getenv("OS") == "Windows_NT" then 
