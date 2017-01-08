@@ -24,7 +24,7 @@ function reddit:InitAttr()				--初始化属性:endpn,reddits...
 	if self.context ==nil then 
 		return 
 	end
-	local reg_lastpn = "pn=(%d+)\" class=\"last pagination%-item \""
+	local reg_lastpn = "pn=(%d+)\"%s-class=\"%s-last%s-pagination%-item%s-\""
 	self.curpn = 0
 	self.intpn = 50 --每页间距
 	local r_pos
@@ -49,16 +49,16 @@ function reddit:Extract()				--抽取页面的帖子地址
 	end
 	local reg_topic = "<a href=\"/p/(%d+)\""
 	for w in string.gmatch(self.context,reg_topic) do
-		if w == "3080630083" then 
-			return
-		end
+		--if w == "3080630083" then 
+		--	return
+		--end
 		table.insert(self.reddits,{addr = self.preaddr .. w})
 	end
 end
 
 function reddit:ListAll()				--列出所有的页面,并抽取
-	--if self.curpn>self.endpn then 
-	if self.curpn > 10 then
+	if self.curpn>self.endpn then 
+	--if self.curpn > 10 then
 	print("所有帖子已抽取完毕,开始解析...") 
 		return self:PostDetail()
 	end
@@ -118,8 +118,8 @@ function reddit:CreateCure(waddr,pn,pagecontext)					--治疗帖子成可阅读�
 					return pagecontext
 				end
 			end]]
-			print(os.clock(),"==",cc.word,cc.id,"==")
 			table.insert(pagecontext,cc)
+			print(string.format("当前耗时:%2f,	楼层id:%s:%s ... ",os.clock(),cc.id,string.sub(cc.word,1,30)))
 		end
 
 	else
@@ -153,7 +153,7 @@ function reddit:Serialize()
 		table.insert(total_output,table.concat( stair_output,"\n"))
 	end
 	if file then 
-		file:write(table.concat(total_output, "\n".. string.rep("*",30) .. "\n"))
+		file:write(string.rep("*",30) .. "\n",table.concat(total_output, "\n".. string.rep("*",30) .. "\n"))
 		file:close()
 	end
 	--接受图片
@@ -176,38 +176,18 @@ function reddit:Serialize()
 	print(grat)
 end
 
-
-
-
-local REDDIT_NAME = "荷园乐海"
---[[
-reddit:GetInst(REDDIT_NAME)
-]]
-
+local REDDIT_NAME = "吹响上低音号"
 function reddit:Run(REDDIT_NAME)
 	self:GetInst(REDDIT_NAME)
-	package.path = package.path .. ";/Users/0280102pc0102/Desktop/whatitmeans/aul/?.lua"
-	require("print_r")
-	print_r(self.reddits)
-	self:Serialize()
-	--[[for k,v in pairs(self.reddits) do
-		print(k,v)
-		for l,w in pairs(v) do
-			print("==",l,w)
-		end
-	end]]
+	if false then
+		package.path = package.path .. ";/Users/0280102pc0102/Desktop/whatitmeans/aul/?.lua"
+		require("print_r")
+		print_r(self.reddits)
+	end
+	if #self.reddits ~= 0 then 
+		self:Serialize()
+	else
+		print("NOTHING TO SERIALIZE,SIR")
+	end
 end
-
 reddit:Run(REDDIT_NAME)
-
-
---[[local class = tieba
-calss tiebapage
-tieba has attr tiebapage
-tiebapa has method goto tiebapage
-tiebapage has attr tiezi
-tiebapage has method  get alltiezi
-...
-
-
-<li class=" j_thread_list]]
