@@ -97,14 +97,14 @@ function reddit:CreateCure(waddr,pn,pagecontext)					--治疗帖子成可阅读�
 		local reg_topic = "<cc>.-</cc>"
 		local reg_stairsinfo = "PageData%.thread.-author: \"(.+)\" "
 		for w in string.gmatch(context,reg_topic) do
-			local cc = {id ="",all ="",img={},word={}}					--每一个帖子的内容
+			local cc = {id ="",all ="",img={},word={}}						--每一个帖子的内容
 			local reg_id = "post_content_(%d+)"
 			local id = string.match(w,reg_id)
-			local reg_img = "http.-jpg"
+			local reg_img = "BDE_Image\"%s-src=\"(http.-jpg)"				--匹配图片
 			for img in string.gmatch(w,reg_img) do
 				table.insert(cc.img,img)
 			end
-			local reg_header = "<.->"
+			local reg_header = "<.->"										--去掉所有的标头和空白
 			cc.word,_ = string.gsub(w,reg_header,"")
 			cc.word,_ = string.gsub(cc.word,"%s","")
 			cc.all = w
