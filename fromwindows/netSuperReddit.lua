@@ -1,4 +1,4 @@
---扒光某个贴吧所有的图片
+--扒光某个贴吧所有的图片,改成如果有图片就立即序列化,因为发现贴吧有预料不到的情况,最后序列化的话可能走不到那一步--
 local socket = require("socket")
 local http = require("socket.http")
 local reddit = {}
@@ -18,6 +18,8 @@ function  reddit:GetInst(REDDIT_NAME)
 end
 
 function reddit:InitAttr()				--初始化属性:endpn,reddits...
+	self.pwd = string.sub(io.popen("pwd"):read("*a"),1,-2)
+	self.dirdiv = package.config:sub(1,1)
 	self.preaddr = "http://tieba.baidu.com/p/"
 	self.listaddr = self.redditaddr .. self.redditname .. "&pn="
 	self.reddits = {}
@@ -34,12 +36,20 @@ function reddit:InitAttr()				--初始化属性:endpn,reddits...
 		return
 	end
 	self.endpn  = self.endpn +0
+	--@@@ 设置最多能爬取多少页，不然电脑就炸了
+	self.endpn = math.min(self.endpn,50*100)
+	if self.endpn == 50*100 then
+		print("\27[37m贴吧帖子太多,将只爬取前100页内容\27[0m")
+	end
 	local reg_topic = "共有主题数.-(%d+).-贴子数.-(%d+)"
 	_,r_pos,self.topicnum,self.redditnum  = string.find(self.context,reg_topic,r_pos)
 	local reg_fan = ">(.-)</a>数.-(%d+)"
 	_,r_pos,self.fanname,self.fannum = string.find(self.context,reg_fan,r_pos+20)
 	local infomation = string.format("\n[%s]吧共有主题数[%s]个,帖子[%s]篇,会员[%s]:[%s]\n开始抽取帖子...\n",self.redditname,self.topicnum,self.redditnum,self.fanname,self.fannum)
 	print(string.rep("*",string.len(infomation)) .. infomation .. string.rep("*",string.len(infomation)))
+	self.picdir = self.pwd .. self.dirdiv .. "图片_" ..self.redditname
+	local res,err = os.execute("mkdir " .. self.picdir)
+	print("创建图片文件夹结果:",res,err)
 	self:ListAll()
 end
 
@@ -59,7 +69,7 @@ end
 function reddit:ListAll()				--列出所有的页面,并抽取
 	if self.curpn>self.endpn then 
 	--if self.curpn > 10 then
-	print("所有帖子已抽取完毕,开始解析...") 
+		print("所有帖子已抽取完毕,开始解析...") 
 		return self:PostDetail()
 	end
 	local context,err = http.request(self.listaddr .. self.curpn)
@@ -89,9 +99,16 @@ function reddit:CreateCure(waddr,pn,pagecontext)					--治疗帖子成可阅读�
 	local page_addr = waddr .."?pn=" .. pn
 	local context,err = http.request(page_addr)
 	if pn == 1 then 
+		self.morestairs = false
 		reg_stairsinfo = "PageData%.thread.-author:%s+\"(.+)\".-title:%s+\"(.+)\".-reply_num:(%d+)"
 		--local author,title,reply_num
 		pagecontext.info = {string.match(context,reg_stairsinfo)}
+		local author,title,reply_num = table.unpack(pagecontext.info)
+		local reg_morestairs = "盖.*楼"
+		if string.match(title,reg_morestairs) then
+			self.morestairs = true
+		end
+		print(string.format("当前耗时:%0.3f		正在治疗帖子--> %s ... ",os.clock(),string.sub(pagecontext.info[2],1,30)))
 	end
 	if err ==200 then
 		local reg_topic = "<cc>.-</cc>"
@@ -110,6 +127,11 @@ function reddit:CreateCure(waddr,pn,pagecontext)					--治疗帖子成可阅读�
 			cc.all = w
 			cc.id = id
 			if pagecontext.check_t[id] then
+				print(string.format("当前耗时:%2f 	当前帖子已治疗完毕:发现楼层数[%s]",os.clock(),#pagecontext))
+				return pagecontext
+			end
+			--@@@@@盖楼的小朋友别闹,只爬取前5页
+			if self.morestairs and #pagecontext > 150 then 
 				return pagecontext
 			end
 			pagecontext.check_t[id] = true
@@ -119,7 +141,11 @@ function reddit:CreateCure(waddr,pn,pagecontext)					--治疗帖子成可阅读�
 				end
 			end]]
 			table.insert(pagecontext,cc)
-			print(string.format("当前耗时:%2f,	楼层id:%s:%s ... ",os.clock(),cc.id,string.sub(cc.word,1,30)))
+			if #cc.img~= 0 then
+				local imgnum = #cc.img
+				print(string.format("\27[37m在%s楼中发现%s张图片,开始下载...\27[0m",#pagecontext,imgnum))
+				self:downimg(cc.img)
+			end
 		end
 
 	else
@@ -128,13 +154,26 @@ function reddit:CreateCure(waddr,pn,pagecontext)					--治疗帖子成可阅读�
 	return self:CreateCure(waddr,pn+1,pagecontext)	
 end
 
-function reddit:Serialize()
-	self.pwd = string.sub(io.popen("pwd"):read("*a"),1,-2)
-	if os.getenv("OS") == "Windows_NT" then
-		self.dirdiv = "\\"
-	else
-		self.dirdiv = "/"
+function reddit:downimg(imglist)
+	for i,imgurl in ipairs(imglist) do 
+		local imgname = imgurl:match("(http.-)%.jpg")
+		while (function() imgname = imgname:sub(imgname:find("/")+1) return imgname:find("/") end)() do
+			--do nothing,just get name of this img from url
+		end
+		print("正在下载图片--> " .. imgname)
+		local file = io.open(self.picdir .. self.dirdiv .. imgname .. ".jpg","w")
+		local context,err = http.request(imgurl)
+		if err == 200 then 
+			file:write(context)
+			file:close()
+		else
+			print("下载图片失败,错误码:",err)
+			file:close()
+		end	
 	end
+end
+
+function reddit:Serialize()
 	local file = io.open(self.pwd .. self.dirdiv ..self.redditname .. ".txt","w")
 	local total_output = {}
 	local total_imglist = {}
@@ -145,9 +184,9 @@ function reddit:Serialize()
 		local stair_output = {string.format("作者:%-30s标题:%s[%s回复]\n原贴地址:%s",table.unpack(ex_info))}
 		for j,stair in ipairs(reddit.context) do
 			table.insert(stair_output,string.format("%d楼:%s",j,stair.word))
-			if #stair.img>0 then 
-				total_imglist[reddit.context.info[2]] = stair.img
-			end
+			--if #stair.img>0 then 
+			--	total_imglist[reddit.context.info[2]] = stair.img
+			--end
 
 		end
 		table.insert(total_output,table.concat( stair_output,"\n"))
@@ -156,7 +195,7 @@ function reddit:Serialize()
 		file:write(string.rep("*",30) .. "\n",table.concat(total_output, "\n".. string.rep("*",30) .. "\n"))
 		file:close()
 	end
-	--接受图片
+	--[[接受图片
 	res,err= os.execute("mkdir " .. self.pwd .. self.dirdiv.. "图片_" ..self.redditname)
 	for title,imglist in pairs(total_imglist) do
 		for i,imgaddr in ipairs(imglist) do
@@ -167,7 +206,7 @@ function reddit:Serialize()
 				file:close()
 			end
 		end
-	end
+	end]]
 	local grat = [[
 =========================================
 =====[SERIALIZE COMPLETED,HAVE FUN!]=====
@@ -175,19 +214,19 @@ function reddit:Serialize()
 ]]
 	print(grat)
 end
-
-local REDDIT_NAME = "吹响上低音号"
+--@@@@这儿改成正确的贴吧名字,不要写错了。
+local REDDIT_NAME = "轻音"
 function reddit:Run(REDDIT_NAME)
 	self:GetInst(REDDIT_NAME)
-	if false then
+	--[[if false then
 		package.path = package.path .. ";/Users/0280102pc0102/Desktop/whatitmeans/aul/?.lua"
 		require("print_r")
 		print_r(self.reddits)
 	end
-	if #self.reddits ~= 0 then 
+	if  #self.reddits ~= 0 then 
 		self:Serialize()
 	else
 		print("NOTHING TO SERIALIZE,SIR")
-	end
+	end]]
 end
 reddit:Run(REDDIT_NAME)
