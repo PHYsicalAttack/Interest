@@ -104,9 +104,12 @@ function reddit:CreateCure(waddr,pn,pagecontext)					--治疗帖子成可阅读�
 		--local author,title,reply_num
 		pagecontext.info = {string.match(context,reg_stairsinfo)}
 		local author,title,reply_num = table.unpack(pagecontext.info)
-		local reg_morestairs = "盖.*楼"
-		if string.match(title,reg_morestairs) then
-			self.morestairs = true
+		local reg_morestairs = {"盖.+楼","真.+爱.+楼","天.+顶","来.+顶"}
+		for i,v in ipairs(reg_morestairs) do
+			if string.match(title,v) then
+				self.morestairs = true
+				break
+			end
 		end
 		print(string.format("当前耗时:%0.3f		正在治疗帖子--> %s ... ",os.clock(),string.sub(pagecontext.info[2],1,30)))
 	end
@@ -130,8 +133,10 @@ function reddit:CreateCure(waddr,pn,pagecontext)					--治疗帖子成可阅读�
 				print(string.format("当前耗时:%2f 	当前帖子已治疗完毕:发现楼层数[%s]",os.clock(),#pagecontext))
 				return pagecontext
 			end
-			--@@@@@盖楼的小朋友别闹,只爬取前5页
-			if self.morestairs and #pagecontext > 150 then 
+			--@@@@@盖楼的小朋友别闹,只爬取前5页,小小朋友跪了起的名字好奇怪,什么真爱楼天天顶没匹配到,卡住了.
+			--@@@@@限制每个贴子最多只扒300楼
+			if  #pagecontext>150 and  self.morestairs or #pagecontext >300 then 
+				--self.morestairs and #pagecontext > 150 then 
 				return pagecontext
 			end
 			pagecontext.check_t[id] = true
@@ -215,7 +220,7 @@ function reddit:Serialize()
 	print(grat)
 end
 --@@@@这儿改成正确的贴吧名字,不要写错了。
-local REDDIT_NAME = "轻音"
+local REDDIT_NAME = "你的名字"
 function reddit:Run(REDDIT_NAME)
 	self:GetInst(REDDIT_NAME)
 	--[[if false then
