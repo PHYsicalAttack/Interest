@@ -1,5 +1,5 @@
 local socket = require "socket"
-local https = require("ssl.https")
+--local https = require("ssl.https")
 local http = require "socket.http"
 
 --[[local file = io.open(os.getenv("HOME") .. "/Desktop/test.jpg","w")
@@ -19,10 +19,18 @@ http.TIMEOUT = 3
 local res3,code3 =https.request("htpp://www.google.com")
 print(res3,code3)]]
 
-local context,code = http.request("http://10.10.11.20/cmd?type=170")  --170
---local context,code = http.request("http://10.10.11.20/cmd?type=pkg")  --主线
-print(code)
-os.remove(os.getenv("HOME") .. "/Desktop/test.zip")
-local file = io.open(os.getenv("HOME") .. "/Desktop/test.zip","w")
-file:write(context)
-file:close()
+--local context,code = http.request("http://10.10.11.72:13579/cmd?type=230")  --170
+local context,code = http.request("http://10.10.11.72:13579/cmd?type=pkg")  --主线
+if code = 200 then 
+    print([[
+******************************
+***get seerpack success!******
+******************************]]
+    os.remove(os.getenv("HOME") .. "/Desktop/test.zip")
+    local file = io.open(os.getenv("HOME") .. "/Desktop/test.zip","w")
+    file:write(context)
+    file:close()
+else
+    print("can't get seerpack because of error: " .. code)
+
+end

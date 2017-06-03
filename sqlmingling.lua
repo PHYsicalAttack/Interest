@@ -47,7 +47,7 @@ grant ALL PRIVILEGES on *.* to 'root'@'%'identified by 'root' with grant option;
 在windows中MySql以服务形式存在，在使用前应确保此服务已经启动，未启动可用net start mysql命令启动。而Linux中启动时可用“/etc/rc.d/init.d/mysqld start”命令，注意启动者应具有管理员权限。
 刚安装好的MySql包含一个含空密码的root帐户和一个匿名帐户，这是很大的安全隐患，对于一些重要的应用我们应将安全性尽可能提高，在这里应把匿名帐户删除、 root帐户设置密码，可用如下命令进行：
 use mysql;
-delete from User where User=”";
+delete from User where User="";
 update User set Password=PASSWORD(’newpassword’) where User=’root’;
 如果要对用户所用的登录终端进行限制，可以更新User表中相应用户的Host字段，在进行了以上更改后应重新启动数据库服务，此时登录时可用如下类似命令：
 mysql -uroot -p;

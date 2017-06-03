@@ -21,12 +21,14 @@ function Interest:Info()	--开始是时要调用这个函数
 					[7]="わたしの恋はホッチキス.lua",
 					[8]="Only my railgun.lua",
 					[9]="Don't cry.lua",
+					[10] = "家.lua",
 				}
 	self.picnames={
 					[1]="御坂美琴.lua",
 					[2]="呆唯.lua",
+					[3]="康娜.lua",
 				}
-	self.path ="/Users/0280102pc0102/Desktop/what it means/aul/Interest.lua"
+	self.path ="/Users/0280102pc0102/Desktop/whatitmeans/aul/Interest.lua"
 	self.height = 34   --34
 	self.width = self.height *3
 	self.screen_t = {} 							--屏幕
