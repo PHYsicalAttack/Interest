@@ -58,4 +58,6 @@ function print_r (t, name)
     print(pr(t,name))   
 end   
   
-local a = {x=1, y=2, label={text='hans', color='blue'}, list={'a','b','c'}}  
+local a = {x=1, y=2, label={text='hans', color='blue'}, list={'a','b','c'}} 
+
+print_r(a)

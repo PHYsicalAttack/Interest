@@ -1,2 +1,4 @@
 # Interest
-something interesting
+---------------
+> 一些乱七八遭的lua脚本，很多是刚开始玩的时候写的，有个Interest的东西，无聊的时候可以耍。
+> 

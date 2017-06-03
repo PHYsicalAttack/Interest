@@ -10,6 +10,15 @@ luac.out
 /lua/*
 /3.0rc1-2
 /3.0rc1-2/*
+/fromwindows
+.DS_Store
+
+
+
+
+
+
+
 
 # luarocks build files
 *.src.rock
